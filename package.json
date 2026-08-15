@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "mkdir -p public && rsync -a --exclude .git --exclude .vercel --exclude public ./ public/"
+    "build": "mkdir -p public && rsync -a --exclude .git --exclude .vercel --exclude '.env*' --exclude public ./ public/"
   }
 }
