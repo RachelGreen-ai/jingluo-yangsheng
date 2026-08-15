@@ -1,0 +1,438 @@
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <header class="top">
+    <div class="titlerow">
+      <h1 class="title" id="hTitle"></h1>
+      <div class="tools">
+        <button class="tbtn active" id="playBtn" aria-pressed="true">⏸ 气血流注</button>
+        <button class="tbtn" id="fsBtn" title="调整字号">A⁺ 字号</button>
+        <button class="tbtn" id="animBtn" aria-pressed="false">✦ 动画</button>
+      </div>
+    </div>
+    <div class="subtitle" id="hSub"></div>
+  </header>
+
+  <div class="app">
+    <!-- Stage -->
+    <div class="stage">
+      <div class="stage-hint" id="stageHint">真人解剖图（Wikimedia Commons, CC0）· 红点即穴位，轻触查看讲解</div>
+      <div class="figbox" id="figbox">
+        <img class="bodyimg" id="bodyimg" alt="真人解剖底图">
+        <canvas class="qi" id="qi"></canvas>
+        <svg class="overlay" id="overlay" viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet" role="img" aria-label="经络与穴位叠加层">
+          <defs>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#e8c874"/><stop offset="1" stop-color="#c9a24b"/>
+            </linearGradient>
+            <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="0.55" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="dotGlow" x="-120%" y="-120%" width="340%" height="340%">
+              <feGaussianBlur stdDeviation="0.5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="meridianLayer"></g>
+          <g id="mainPoints"></g>
+          <g id="clusterLayer"></g>
+        </svg>
+      </div>
+
+      <div class="stage-chips" id="stageChips"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="intro">经络走向</button>
+        <button class="tab" data-tab="points" id="tabPointsBtn">穴位</button>
+        <button class="tab" data-tab="disease">病候</button>
+        <button class="tab" data-tab="care">养生</button>
+      </div>
+
+      <!-- INTRO -->
+      <section class="panel active" id="tab-intro">
+        <div class="card-box syscard" id="sysCard"></div>
+        <div class="card-box">
+          <h2><span class="mark"></span><span id="introDirTitle"></span></h2>
+          <p class="flowtext" id="introFlow"></p>
+          <p class="quote" id="introQuote"></p>
+          <div class="meta-row" id="introBadges"></div>
+        </div>
+        <div class="card-box">
+          <h2><span class="mark"></span><span id="organTitle"></span></h2>
+          <p class="lead" id="organLead"></p>
+          <ul class="list-clean" id="organList"></ul>
+        </div>
+        <div class="card-box">
+          <h2><span class="mark"></span>十二经流注 · 承前启后</h2>
+          <p class="lead" id="flowLead"></p>
+          <div class="flow-nav">
+            <span class="prev" id="flowPrev"></span>
+            <span class="cur" id="flowCur"></span>
+            <span class="prev" id="flowNext" style="border-color:var(--gold-deep);color:var(--gold-deep);font-weight:600"></span>
+          </div>
+          <p class="quote" style="margin-top:10px">十二经流注顺序：肺 → 大肠 → 胃 → 脾 → 心 → 小肠 → 膀胱 → 肾 → 心包 → 三焦 → 胆 → 肝 →（复始）肺</p>
+          <p style="margin-top:12px;text-align:center"><a href="index.html" style="color:var(--gold-deep);font-weight:600;text-decoration:none;border:1px solid var(--gold-deep);border-radius:999px;padding:8px 18px;display:inline-block;min-height:40px">☰ 十二时辰图谱首页</a></p>
+        </div>
+      </section>
+
+      <!-- POINTS -->
+      <section class="panel" id="tab-points">
+        <div class="card-box">
+          <h2><span class="mark"></span><span id="pointsTitle"></span></h2>
+          <p class="lead">按经络走向排列。轻触任意一穴，查看"怎么在自己身上找它、它管什么、怎么自己保健"。</p>
+          <div class="points-list" id="pointsList" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <!-- DISEASE -->
+      <section class="panel" id="tab-disease">
+        <div class="card-box">
+          <h2><span class="mark"></span><span id="diseaseTitle"></span></h2>
+          <p class="lead" id="diseaseLead"></p>
+          <div id="diseaseBlocks"></div>
+          <h3>对症选穴 · 速查</h3>
+          <p class="lead" style="margin-bottom:2px">轻触症状，跳到常用的保健穴位：</p>
+          <div class="chips-wrap" id="symptomChips"></div>
+        </div>
+      </section>
+
+      <!-- CARE -->
+      <section class="panel" id="tab-care">
+        <div class="card-box">
+          <h2><span class="mark"></span><span id="shiTitle"></span></h2>
+          <div class="clockwrap">
+            <svg viewBox="0 0 200 200" width="150" height="150" aria-label="十二时辰盘，当令时辰高亮">
+              <circle cx="100" cy="100" r="88" fill="var(--paper)" stroke="var(--line-2)" stroke-width="2"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="var(--line)" stroke-width="1"/>
+              <g id="clockMarks"></g>
+              <circle cx="100" cy="100" r="6" fill="var(--gold-deep)"/>
+            </svg>
+            <div class="clocktxt">
+              <div class="big" id="shiBig"></div>
+              <p class="lead" id="shiText"></p>
+            </div>
+          </div>
+        </div>
+        <div id="careBlocks"></div>
+        <div class="disclaimer" id="careDisclaimer"></div>
+      </section>
+    </div><!-- /content -->
+  </div><!-- /app -->
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<!-- Detail card -->
+<div id="scrim"></div>
+<aside id="card" role="dialog" aria-modal="false" aria-labelledby="cardTitle">
+  <div class="card-grab"></div>
+  <div class="card-head">
+    <div class="card-code" id="cardCode"></div>
+    <div class="card-title" id="cardTitle"></div>
+    <div id="cardTags"></div>
+    <button class="card-close" id="cardClose" aria-label="关闭">✕</button>
+  </div>
+  <div class="card-body">
+    <h4>◈ 怎么找到它</h4>
+    <p class="locate" id="cardLocate"></p>
+    <h4>◈ 主治 · 它管什么</h4>
+    <p id="cardIndic"></p>
+    <h4>◈ 自我保健 · 怎么做</h4>
+    <p class="care" id="cardCare"></p>
+  </div>
+</aside>
+
+<!-- Zoom modals injected here -->
+<div id="zoomHost"></div>
+
+<script>
+const IMGS = /*__IMGS__*/;
+const M = /*__DATA__*/;
+const SVGNS="http://www.w3.org/2000/svg";
+const byCode = {}; M.points.forEach(p=>byCode[p.code]=p);
+const N = (v)=>v==null?'':v;
+
+/* ---- header ---- */
+document.title = M.name + " · 经络养生";
+document.getElementById('hTitle').innerHTML = M.name + '<span class="en">'+N(M.en)+'</span>';
+document.getElementById('hSub').innerHTML = M.subtitle;
+document.getElementById('footer').innerHTML = '— '+M.name+' · 经络养生 <span class="plum">❁</span> 愿你与家人 气顺神安 —';
+if(M.stageHint) document.getElementById('stageHint').textContent = M.stageHint;
+
+/* ---- base image ---- */
+const bodyimg = document.getElementById('bodyimg');
+bodyimg.src = IMGS[M.img];
+const overlay = document.getElementById('overlay');
+overlay.setAttribute('viewBox', M.viewBox);
+
+/* ---- overlay: meridian paths ---- */
+const ov = M.overlay||{};
+const ml = document.getElementById('meridianLayer');
+function addPath(cls,d,extra){ const p=document.createElementNS(SVGNS,'path'); p.setAttribute('class',cls); p.setAttribute('d',d); if(extra) for(const k in extra) p.setAttribute(k,extra[k]); ml.appendChild(p); return p; }
+if(ov.vesselFaint) addPath('vessel-faint', ov.vesselFaint);
+if(ov.vessel) addPath('vessel', ov.vessel);
+if(ov.flow) addPath('flow', ov.flow||ov.vessel);
+if(ov.origin){
+  addPath('origin', ov.origin.d);
+  if(ov.origin.marker){ const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('class','origin-lab'); c.setAttribute('cx',ov.origin.marker.x); c.setAttribute('cy',ov.origin.marker.y); c.setAttribute('r','0.9'); c.setAttribute('fill','#9c4636'); ml.appendChild(c); }
+  if(ov.origin.label){ const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','origin-lab ptlab'); t.setAttribute('x',ov.origin.label.x); t.setAttribute('y',ov.origin.label.y); t.setAttribute('font-size','3'); t.setAttribute('text-anchor',ov.origin.label.anchor||'start'); t.textContent=ov.origin.label.text; ml.appendChild(t); }
+}
+if(ov.branch){
+  addPath('branch', ov.branch.d);
+  if(ov.branch.label){ const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','branch-lab ptlab'); t.setAttribute('x',ov.branch.label.x); t.setAttribute('y',ov.branch.label.y); t.setAttribute('font-size','3.2'); t.setAttribute('text-anchor',ov.branch.label.anchor||'end'); t.textContent=ov.branch.label.text; ml.appendChild(t); }
+}
+
+/* ---- main-figure points ---- */
+const mp = document.getElementById('mainPoints');
+M.points.filter(p=>p.x!=null && p.onMain!==false).forEach(p=>{
+  const g=document.createElementNS(SVGNS,'g');
+  const halo=document.createElementNS(SVGNS,'circle');
+  halo.setAttribute('class','halo');halo.setAttribute('cx',p.x);halo.setAttribute('cy',p.y);halo.setAttribute('r','2.3');
+  halo.style.animationDelay=((p.n||1)*0.25)+'s';
+  const c=document.createElementNS(SVGNS,'circle');
+  c.setAttribute('class','pt');c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r','1.7');
+  c.setAttribute('tabindex','0');c.setAttribute('role','button');c.setAttribute('aria-label',p.name+'穴');c.dataset.code=p.code;
+  g.appendChild(halo);g.appendChild(c);
+  if(p.k){ // key point: show label on figure
+    const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','ptlab');
+    const left = (p.lab==='L')|| (p.lab==null && p.x<50);
+    t.setAttribute('x', left ? p.x-2.6 : p.x+2.6);
+    t.setAttribute('y', p.y+1.2);
+    t.setAttribute('text-anchor', left?'end':'start');
+    t.textContent=p.name; g.appendChild(t);
+  }
+  mp.appendChild(g);
+});
+
+/* ---- cluster marker ---- */
+if(ov.cluster){
+  const cl=document.getElementById('clusterLayer');
+  const g=document.createElementNS(SVGNS,'g'); g.setAttribute('tabindex','0'); g.setAttribute('role','button'); g.setAttribute('aria-label',ov.cluster.label+'，点击放大'); g.id='clusterMarker';
+  const halo=document.createElementNS(SVGNS,'circle'); halo.setAttribute('class','halo'); halo.setAttribute('cx',ov.cluster.x); halo.setAttribute('cy',ov.cluster.y); halo.setAttribute('r','2.2');
+  const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('class','cluster'); c.setAttribute('cx',ov.cluster.x); c.setAttribute('cy',ov.cluster.y); c.setAttribute('r','3.2');
+  const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','cluster-lab'); t.setAttribute('x',ov.cluster.x); t.setAttribute('y',+ov.cluster.y+0.7); t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','2'); t.textContent=ov.cluster.label;
+  g.appendChild(halo);g.appendChild(c);g.appendChild(t); cl.appendChild(g);
+  g.addEventListener('click',()=>openZoom(ov.cluster.zoom||(M.zoom&&M.zoom[0]&&M.zoom[0].id)));
+  g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();openZoom(ov.cluster.zoom||(M.zoom&&M.zoom[0]&&M.zoom[0].id));} });
+}
+if(ov.clusters){
+  const cl=document.getElementById('clusterLayer');
+  ov.clusters.forEach(cc=>{
+    const g=document.createElementNS(SVGNS,'g'); g.setAttribute('tabindex','0'); g.setAttribute('role','button'); g.setAttribute('aria-label',cc.label+'放大');
+    const halo=document.createElementNS(SVGNS,'circle'); halo.setAttribute('class','halo'); halo.setAttribute('cx',cc.x); halo.setAttribute('cy',cc.y); halo.setAttribute('r','2.4');
+    const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('class','cluster'); c.setAttribute('cx',cc.x); c.setAttribute('cy',cc.y); c.setAttribute('r','3.4');
+    const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','cluster-lab'); t.setAttribute('x',cc.x); t.setAttribute('y',+cc.y+0.8); t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','2.4'); t.textContent='⊕'+cc.label;
+    g.appendChild(halo);g.appendChild(c);g.appendChild(t); cl.appendChild(g);
+    g.addEventListener('click',()=>openZoom(cc.zoom));
+    g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();openZoom(cc.zoom);} });
+  });
+}
+
+/* ---- stage chips ---- */
+const chips=document.getElementById('stageChips');
+function mkChip(id,html){ const b=document.createElement('button'); b.className='chip'; b.id=id; b.innerHTML=html; chips.appendChild(b); return b; }
+if(ov.origin){ const b=mkChip('originChip','<span class="dot" style="background:#9c4636"></span>'+(ov.origin.chip||'起始·内行段')); b.onclick=()=>{const on=overlay.classList.toggle('show-origin'); b.classList.toggle('on',on);}; }
+if(ov.branch){ const b=mkChip('branchChip','<span class="dot"></span>'+(ov.branch.chip||'显示分支')); b.onclick=()=>{const on=overlay.classList.toggle('show-branch'); b.classList.toggle('on',on);}; }
+
+/* ---- zoom modals ---- */
+const zoomHost=document.getElementById('zoomHost');
+const zoomEls={};
+(M.zoom||[]).forEach(z=>{
+  const ZS=(parseFloat((z.viewBox||'0 0 100 100').split(' ')[2])/100)||1;  // window-width scale
+  const wrap=document.createElement('div'); wrap.className='zoommodal'; wrap.id='zoom-'+z.id; wrap.setAttribute('role','dialog'); wrap.setAttribute('aria-modal','true');
+  wrap.innerHTML =
+    '<div class="zoom-inner"><button class="zoom-close" aria-label="关闭">✕</button>'+
+    '<h3>'+z.title+'</h3><div class="sub">'+N(z.sub)+'</div>'+
+    '<svg class="zsvg" viewBox="'+z.viewBox+'" preserveAspectRatio="xMidYMid meet">'+
+      '<defs><filter id="dg-'+z.id+'" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="0.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
+      (z.bg ? z.bg : '<image href="'+IMGS[z.img]+'" x="0" y="0" width="100" height="'+ (z.imgH || z.viewBox.split(' ')[3]) +'" preserveAspectRatio="xMidYMid meet"/>')+
+      (z.vessel?'<path class="vessel" d="'+z.vessel+'" opacity="0.85" style="stroke-width:'+(1.3*ZS)+'"/>':'')+
+      '<g class="zpts"></g>'+
+    '</svg></div>';
+  zoomHost.appendChild(wrap);
+  zoomEls[z.id]=wrap;
+  // points in this modal — scale marker/label to the window width so windowed
+  // zooms (viewBox narrower than 100) render dots/text at normal on-screen size
+  const gp=wrap.querySelector('.zpts');
+  (z.points||[]).forEach(zp=>{
+    const p=byCode[zp.code]; if(!p) return;
+    const halo=document.createElementNS(SVGNS,'circle'); halo.setAttribute('class','halo'); halo.setAttribute('cx',zp.x); halo.setAttribute('cy',zp.y); halo.setAttribute('r',2.6*ZS);
+    const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('class','pt'); c.setAttribute('cx',zp.x); c.setAttribute('cy',zp.y); c.setAttribute('r',2*ZS); c.setAttribute('tabindex','0'); c.setAttribute('role','button'); c.setAttribute('aria-label',p.name+'穴'); c.setAttribute('filter','url(#dg-'+z.id+')'); c.dataset.code=p.code; c.style.strokeWidth=(0.4*ZS);
+    const t=document.createElementNS(SVGNS,'text'); t.setAttribute('class','ptlab'); t.setAttribute('x',+zp.x+3.5*ZS); t.setAttribute('y',+zp.y+1.2*ZS); t.setAttribute('text-anchor','start'); t.style.fontSize=(3.5*ZS)+'px'; t.style.strokeWidth=(0.9*ZS)+'px'; t.textContent=p.name+'（'+p.code+'）';
+    gp.appendChild(halo);gp.appendChild(c);gp.appendChild(t);
+  });
+  // declutter: nudge overlapping labels down so dense clusters stay readable
+  const labs=[...gp.querySelectorAll('.ptlab')].sort((a,b)=>(+a.getAttribute('y'))-(+b.getAttribute('y')));
+  const gap=3.7*ZS; let last=-1e9;
+  labs.forEach(t=>{ let y=+t.getAttribute('y'); if(y<last+gap){ y=+(last+gap).toFixed(2); t.setAttribute('y',y); } last=y; });
+  wrap.querySelector('.zoom-close').onclick=()=>closeZoom(z.id);
+  wrap.addEventListener('click',e=>{ if(e.target===wrap) closeZoom(z.id); });
+  // chip
+  const b=mkChip('zoomChip-'+z.id, N(z.chip)||'⊕ 放大'); b.onclick=()=>openZoom(z.id);
+});
+function openZoom(id){ if(id&&zoomEls[id]) zoomEls[id].classList.add('on'); }
+function closeZoom(id){ if(id&&zoomEls[id]) zoomEls[id].classList.remove('on'); else Object.values(zoomEls).forEach(w=>w.classList.remove('on')); }
+
+/* ---- intro panel ---- */
+const intro=M.intro||{};
+// 系统坐标卡（本经在十二经系统中的位置 + 养生逻辑链）
+(function(){
+  const SY=M.system; const el=document.getElementById('sysCard'); if(!SY||!el){ if(el) el.style.display='none'; return; }
+  el.style.setProperty('--wx', SY.color_hex);
+  const chip=(o,label)=> o?`<a class="sys-chip" href="${o.file}"><i>${label}</i>${o.name}</a>`:'';
+  if(SY.qijing){   // 奇经·任督二脉 变体卡
+    el.innerHTML =
+      `<div class="sys-head"><span class="wx-tag">${SY.yy}</span>`+
+        `<span class="sys-title">${SY.name} · ${SY.nature}<em>（奇经八脉）</em></span>`+
+        `<span class="sys-zhi">共 ${SY.n} 穴<em>单穴</em></span></div>`+
+      `<div class="sys-wuxing">循行 · <b>${SY.line}</b> ｜ ${SY.gov}</div>`+
+      `<div class="sys-rels">${chip(SY.pair,'一阴一阳·相配')}</div>`+
+      `<div class="sys-logic"><i>养生逻辑</i>${SY.logic}</div>`;
+    return;
+  }
+  el.innerHTML =
+    `<div class="sys-head"><span class="wx-tag">${SY.element}</span>`+
+      `<span class="sys-title">${SY.limb}${SY.six} · ${SY.organ}<em>（${SY.phase}·${SY.yy}）</em></span>`+
+      `<span class="sys-zhi">${SY.zhi}<em>当令</em></span></div>`+
+    `<div class="sys-wuxing">${SY.season} · ${SY.emotion} · ${SY.taste}味 · ${SY.color}色 · ${SY.sound}音 · 六字诀「<b>${SY.liu}</b>」</div>`+
+    `<div class="sys-rels">${chip(SY.biao,'表里')}${chip(SY.mother,'母·生我')}${chip(SY.child,'子·我生')}</div>`+
+    `<div class="sys-flow">子午流注 · <a href="${SY.prev.file}">${SY.prev.name}</a> → <b>本经</b> → <a href="${SY.nxt.file}">${SY.nxt.name}</a></div>`+
+    `<div class="sys-logic"><i>养生逻辑</i>${SY.logic}</div>`;
+})();
+document.getElementById('introDirTitle').textContent=intro.dirTitle||('经络走向 · '+N(M.dir));
+document.getElementById('introFlow').innerHTML=N(intro.flowtext);
+document.getElementById('introQuote').innerHTML=N(intro.quote);
+document.getElementById('introBadges').innerHTML=(intro.badges||[]).map(b=>'<span class="badge">'+b+'</span>').join('');
+document.getElementById('organTitle').textContent=N(intro.organTitle);
+document.getElementById('organLead').textContent=N(intro.organLead);
+document.getElementById('organList').innerHTML=(intro.organ||[]).map(t=>'<li>'+t+'</li>').join('');
+const fn=intro.flowNav||{};
+document.getElementById('flowLead').innerHTML=N(fn.lead);
+document.getElementById('flowPrev').textContent='← '+N(fn.prev);
+document.getElementById('flowCur').textContent=M.name;
+const nextEl=document.getElementById('flowNext');
+if(fn.nextFile){ const a=document.createElement('a'); a.href=fn.nextFile; a.textContent=N(fn.next)+' →'; a.style.textDecoration='none'; nextEl.replaceWith(a); }
+else { nextEl.textContent=N(fn.next)+(fn.next?' · 即将推出 →':''); }
+
+/* ---- points tab ---- */
+document.getElementById('tabPointsBtn').textContent='穴位（'+M.points.length+'）';
+document.getElementById('pointsTitle').textContent=N(intro.pointsTitle)||('穴位 · 共 '+M.points.length+' 穴');
+document.getElementById('pointsList').innerHTML=M.points.map(p=>
+  '<button class="pcard" data-code="'+p.code+'"><span class="pnum">'+p.n+'</span>'+
+  '<span class="pinfo"><span class="pname">'+p.name+'<span class="py">'+N(p.py)+' · '+p.code+'</span></span>'+
+  ((p.type&&p.type.length)?'<span class="ptype">'+p.type.join(' · ')+'</span>':'')+
+  '</span><span class="parrow">›</span></button>').join('');
+
+/* ---- disease tab ---- */
+const dis=M.disease||{};
+document.getElementById('diseaseTitle').textContent=N(dis.title)||'病候';
+document.getElementById('diseaseLead').innerHTML=N(dis.lead);
+document.getElementById('diseaseBlocks').innerHTML=(dis.blocks||[]).map(b=>'<h3>'+b.h3+'</h3><p class="lead">'+b.p+'</p>').join('');
+document.getElementById('symptomChips').innerHTML=(dis.symptoms||[]).map((s,i)=>'<button class="pchip" data-sym="'+i+'">'+s.label+'</button>').join('');
+
+/* ---- care tab ---- */
+const care=M.care||{};
+document.getElementById('shiTitle').textContent=N(care.shi&&care.shi.title);
+document.getElementById('shiBig').textContent=N(care.shi&&care.shi.big);
+document.getElementById('shiText').innerHTML=N(care.shi&&care.shi.text);
+document.getElementById('careBlocks').innerHTML=(care.blocks||[]).map(b=>{
+  let h='<div class="card-box"><h2><span class="mark"></span>'+b.h2+'</h2>'+N(b.html);
+  if(b.food){ h+='<h3>白色/应季食疗</h3><div class="chips-wrap">'+b.food.map(f=>'<span class="fchip">'+f+'</span>').join('')+'</div>'; }
+  h+='</div>'; return h;
+}).join('');
+document.getElementById('careDisclaimer').innerHTML=N(care.disclaimer)||'温馨提示：本页为传统养生科普，帮助了解经络与日常保健，<b>不能替代医疗诊断与治疗</b>。急重症状请<b>及时就医</b>；孕妇、有慢性病或特殊体质者，按摩等操作前请先咨询专业医师。';
+
+/* ---- clock ---- */
+const dizhi=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const cm=document.getElementById('clockMarks');
+dizhi.forEach((z,i)=>{
+  const ang=(i/12)*2*Math.PI - Math.PI/2;
+  const R=70, cx=100+R*Math.cos(ang), cy=100+R*Math.sin(ang);
+  const on = z===M.clockZhi;
+  const circ=document.createElementNS(SVGNS,'circle');
+  circ.setAttribute('cx',cx);circ.setAttribute('cy',cy);circ.setAttribute('r',on?15:12);
+  circ.setAttribute('fill', on?'var(--cinnabar)':'var(--paper-2)');
+  circ.setAttribute('stroke', on?'var(--gold-deep)':'var(--line-2)');
+  circ.setAttribute('stroke-width', on?2:1);
+  const tx=document.createElementNS(SVGNS,'text');
+  tx.setAttribute('x',cx);tx.setAttribute('y',cy+4.5);tx.setAttribute('text-anchor','middle');
+  tx.setAttribute('class','clk');tx.setAttribute('font-size',on?'15':'12.5');
+  tx.setAttribute('fill', on?'#fff':'var(--ink-faint)');tx.setAttribute('font-weight', on?'700':'400');
+  tx.textContent=z; cm.appendChild(circ);cm.appendChild(tx);
+});
+
+/* ============ INTERACTIONS ============ */
+const scrim=document.getElementById('scrim'), card=document.getElementById('card');
+function openCard(code){
+  const p=byCode[code]; if(!p) return;
+  document.getElementById('cardCode').textContent=p.code+' · '+M.name+'第'+p.n+'穴';
+  document.getElementById('cardTitle').innerHTML=p.name+'<span class="py">'+N(p.py)+'</span>';
+  document.getElementById('cardTags').innerHTML=(p.type||[]).map(t=>'<span class="type-tag">'+t+'</span>').join('');
+  document.getElementById('cardLocate').innerHTML=N(p.locate);
+  document.getElementById('cardIndic').innerHTML=N(p.indic);
+  document.getElementById('cardCare').innerHTML=N(p.care);
+  card.classList.add('on');scrim.classList.add('on');
+  document.querySelectorAll('.pt').forEach(e=>e.classList.toggle('sel', e.dataset.code===code));
+  document.querySelectorAll('.pcard').forEach(e=>e.classList.toggle('sel', e.dataset.code===code));
+}
+function closeCard(){ card.classList.remove('on');scrim.classList.remove('on'); document.querySelectorAll('.pt.sel,.pcard.sel').forEach(e=>e.classList.remove('sel')); }
+document.getElementById('cardClose').onclick=closeCard; scrim.onclick=closeCard;
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-code]'); if(el) openCard(el.dataset.code); });
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){ const el=e.target.closest&&e.target.closest('[data-code]'); if(el){e.preventDefault();openCard(el.dataset.code);} }
+  if(e.key==='Escape'){ closeCard(); closeZoom(); }
+});
+document.getElementById('symptomChips').addEventListener('click',e=>{ const b=e.target.closest('[data-sym]'); if(!b)return; const s=dis.symptoms[+b.dataset.sym]; if(s&&s.pts&&s.pts.length) openCard(s.pts[0]); });
+
+/* tabs */
+document.querySelectorAll('.tab').forEach(t=>{ t.onclick=()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active')); t.classList.add('active'); document.getElementById('tab-'+t.dataset.tab).classList.add('active'); }; });
+
+/* 气血流注 canvas */
+(function qiFlow(){
+  const cv=document.getElementById('qi'), box=document.getElementById('figbox'), img=bodyimg;
+  if(!cv||!box) return; const ctx=cv.getContext('2d');
+  const VBW=(M.qi&&M.qi.vbw)||100, VBH=(M.qi&&M.qi.vbh)||150;
+  const PATH=(M.qi&&M.qi.path)||[];
+  if(!PATH.length){ return; }
+  let W=0,H=0,dpr=1,poly=[],cum=[],total=0;
+  function resize(){ const r=box.getBoundingClientRect(); if(!r.width||!r.height)return;
+    dpr=Math.min(window.devicePixelRatio||1,2); W=r.width; H=r.height;
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); ctx.setTransform(dpr,0,0,dpr,0,0);
+    poly=PATH.map(p=>[p[0]/VBW*W, p[1]/VBH*H]); cum=[0]; total=0;
+    for(let i=1;i<poly.length;i++){total+=Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]);cum.push(total);} }
+  function at(d){ if(d<=0)return poly[0]; if(d>=total)return poly[poly.length-1];
+    for(let i=1;i<poly.length;i++){ if(cum[i]>=d){const s=cum[i]-cum[i-1],t=(d-cum[i-1])/s; return [poly[i-1][0]+(poly[i][0]-poly[i-1][0])*t, poly[i-1][1]+(poly[i][1]-poly[i-1][1])*t];}} return poly[poly.length-1]; }
+  let parts=[]; const NP=5; for(let i=0;i<NP;i++) parts.push(i/NP);
+  let raf=null, running=true;
+  function frame(){ if(!W){resize(); if(!W){raf=requestAnimationFrame(frame);return;}}
+    ctx.clearRect(0,0,W,H); ctx.globalCompositeOperation='lighter'; const sc=W/VBW;
+    for(let i=0;i<parts.length;i++){ parts[i]+=0.0016; if(parts[i]>1)parts[i]-=1;
+      for(let k=0;k<9;k++){ let t=parts[i]-k*0.011; if(t<0)t+=1; const p=at(t*total), rad=Math.max((2.9-k*0.28)*sc,0.6), a=(1-k/9)*0.55;
+        const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],rad);
+        g.addColorStop(0,'rgba(255,240,196,'+a+')'); g.addColorStop(.4,'rgba(232,200,116,'+(a*0.65)+')'); g.addColorStop(1,'rgba(201,162,75,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p[0],p[1],rad,0,7); ctx.fill(); } }
+    ctx.globalCompositeOperation='source-over'; raf = running ? requestAnimationFrame(frame) : null; }
+  window.addEventListener('resize',resize);
+  if(img){ if(img.complete) resize(); img.addEventListener('load',resize); }
+  setTimeout(resize,250); setTimeout(resize,800);
+  window.__qi={ start(){ if(!running){running=true; if(!raf)raf=requestAnimationFrame(frame);} }, stop(){ running=false; }, resize };
+  raf=requestAnimationFrame(frame);
+})();
+
+/* play/pause, font, anim */
+const playBtn=document.getElementById('playBtn'); let playing=true;
+playBtn.onclick=()=>{ playing=!playing; overlay.classList.toggle('paused',!playing); window.__qi&&(playing?__qi.start():__qi.stop()); playBtn.classList.toggle('active',playing); playBtn.setAttribute('aria-pressed',playing); playBtn.textContent=(playing?'⏸ 气血流注':'▶ 气血流注'); };
+const fsBtn=document.getElementById('fsBtn'); const fsLabels=['A 标准','A⁺ 大','A⁺⁺ 特大']; let fs=0;
+fsBtn.onclick=()=>{ fs=(fs+1)%3; document.documentElement.dataset.fs=fs; fsBtn.textContent=fsLabels[fs]; };
+const animBtn=document.getElementById('animBtn'); let anim=true;
+animBtn.onclick=()=>{ anim=!anim; document.body.classList.toggle('no-anim',!anim); window.__qi&&(anim&&playing?__qi.start():__qi.stop()); animBtn.classList.toggle('active',anim); animBtn.setAttribute('aria-pressed',anim); animBtn.textContent=(anim?'✦ 动画开':'✧ 动画关'); };
+animBtn.classList.add('active'); animBtn.textContent='✦ 动画开';
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){ document.body.classList.add('no-anim'); anim=false; window.__qi&&__qi.stop(); animBtn.classList.remove('active'); animBtn.textContent='✧ 动画关'; animBtn.setAttribute('aria-pressed',false); }
+</script>
+</body>
+</html>

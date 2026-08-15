@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>经络养生 · 十二时辰图谱</title>
+<style>
+  :root{
+    --paper:#F4ECD8; --paper-2:#EFE4C9; --paper-3:#EAdfc0;
+    --ink:#3a3226; --ink-soft:#6b5f4a; --ink-faint:#8a7a55;
+    --gold:#c9a24b; --gold-light:#e8c874; --gold-deep:#a9822f;
+    --cinnabar:#b23a2e; --cinnabar-soft:#c86a5c;
+    --line:rgba(58,50,38,.16); --line-2:rgba(58,50,38,.28);
+    --serif:"Kaiti SC","STKaiti","楷体","BiauKai","Noto Serif SC","Songti SC",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --shadow:0 8px 30px rgba(58,50,38,.18);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:17px}
+  body{margin:0;font-family:var(--sans);color:var(--ink);line-height:1.7;min-height:100vh;
+    background:
+      radial-gradient(120% 90% at 15% 0%, #FBF5E4 0%, rgba(251,245,228,0) 55%),
+      radial-gradient(120% 90% at 90% 20%, #F7EED6 0%, rgba(247,238,214,0) 55%),
+      var(--paper);}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(120,100,60,.05) 1px, transparent 1.4px);background-size:7px 7px;opacity:.7}
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:26px 18px 70px}
+  h1,h2,.serif{font-family:var(--serif)}
+  header{text-align:center;margin-bottom:6px}
+  .title{font-family:var(--serif);font-size:2.1rem;font-weight:500;letter-spacing:.12em;margin:0}
+  .sub{color:var(--ink-faint);letter-spacing:.14em;font-size:.86rem;margin-top:4px}
+  .now{margin:16px auto 6px;text-align:center;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:14px;padding:10px 14px;max-width:520px}
+  .now .big{font-family:var(--serif);font-size:1.25rem;color:var(--cinnabar);font-weight:500;letter-spacing:.05em}
+  .now .big a{color:var(--cinnabar);text-decoration:none;border-bottom:1px dashed var(--cinnabar-soft)}
+  .now small{color:var(--ink-faint)}
+
+  .clockwrap{display:flex;justify-content:center;margin:6px 0 4px}
+  svg.clock{width:min(92vw,440px);height:auto;display:block}
+  .seg{cursor:pointer;transition:.15s}
+  .seg .segfill{fill:var(--paper-2);stroke:var(--paper);stroke-width:1.5;transition:.15s}
+  .seg:hover .segfill{fill:var(--paper-3)}
+  .seg.on .segfill{fill:var(--gold);stroke:var(--gold-deep)}
+  .seg.live .segfill{fill:var(--cinnabar);stroke:#8f2519}
+  .seg.soon{cursor:default}
+  .seg.soon .segfill{opacity:.72}
+  .seg .zhi{font-family:var(--serif);font-size:15px;fill:var(--ink);font-weight:500;pointer-events:none}
+  .seg .org{font-family:var(--sans);font-size:9.5px;fill:var(--ink-soft);pointer-events:none}
+  .seg.live .zhi,.seg.live .org{fill:#fff}
+  .seg.on .zhi{fill:#3a2c08}.seg.on .org{fill:#5a4a1a}
+  .hub{fill:#FBF6E7;stroke:var(--gold-deep);stroke-width:1.5}
+  .hubt1{font-family:var(--serif);font-size:15px;fill:var(--cinnabar);text-anchor:middle;font-weight:500}
+  .hubt2{font-family:var(--sans);font-size:10px;fill:var(--ink-faint);text-anchor:middle}
+  .clock-hint{text-align:center;color:var(--ink-faint);font-size:.8rem;letter-spacing:.08em;margin:2px 0 18px}
+
+  h2.sec{font-family:var(--serif);font-size:1.35rem;font-weight:500;letter-spacing:.08em;margin:22px 0 4px;
+    display:flex;align-items:center;gap:8px}
+  h2.sec .mark{width:5px;height:1.05em;background:linear-gradient(var(--gold),var(--gold-deep));border-radius:2px}
+  .sec-lead{color:var(--ink-soft);font-size:.92rem;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .mcard{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:inherit;
+    background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:13px 15px;transition:.16s;position:relative}
+  a.mcard:hover{background:#FBF6E7;border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 18px rgba(58,50,38,.1)}
+  .mcard .r1{display:flex;align-items:baseline;gap:8px}
+  .mcard .zhi{font-family:var(--serif);font-size:1.5rem;font-weight:500;color:var(--gold-deep);line-height:1}
+  .mcard .tm{font-size:.78rem;color:var(--ink-faint)}
+  .mcard .name{font-family:var(--serif);font-size:1.12rem;font-weight:500;letter-spacing:.03em;margin-top:3px}
+  .mcard .st{font-size:.76rem;margin-top:2px}
+  .mcard.ready .st{color:var(--gold-deep);font-weight:600}
+  .mcard.soon{opacity:.72}
+  .mcard.soon .st{color:var(--ink-faint)}
+  .mcard.live{border-color:var(--cinnabar);box-shadow:0 0 0 1px var(--cinnabar-soft) inset}
+  .mcard .flag{position:absolute;top:10px;right:12px;font-size:.7rem;color:var(--cinnabar);font-weight:700;letter-spacing:.1em}
+
+  .toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:.9rem;
+    transition:.3s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  footer{text-align:center;color:var(--ink-faint);font-size:.8rem;margin-top:28px;letter-spacing:.1em}
+  footer .plum{color:var(--cinnabar)}
+
+  /* 五行相生相克轮 */
+  .wuxing{margin:4px 0 2px}
+  .wx-wrap{display:flex;justify-content:center}
+  .wx-svg{width:min(88vw,380px);height:auto;overflow:visible}
+  .wx-node{cursor:pointer}
+  .wx-node circle.wx-c{transition:.15s}
+  .wx-node:hover circle.wx-c{filter:brightness(1.1)}
+  .wx-el{font-family:var(--serif);font-size:26px;fill:#fff;text-anchor:middle;font-weight:500;pointer-events:none}
+  .wx-organ{font-family:var(--serif);font-size:14px;fill:var(--ink);text-anchor:middle;font-weight:500;pointer-events:none}
+  .wx-meta{font-family:var(--sans);font-size:10px;fill:var(--ink-faint);text-anchor:middle;pointer-events:none}
+  .wx-sheng{fill:none;stroke-width:2.6}
+  .wx-ke{stroke:var(--ink-faint);stroke-width:1;stroke-dasharray:3 4;opacity:.42}
+  .wx-legend{max-width:520px;margin:6px auto 0;font-size:.85rem;color:var(--ink-soft);text-align:center;line-height:1.95}
+  .wx-legend .s{color:var(--gold-deep);font-weight:600}.wx-legend .k{color:var(--ink-faint);font-weight:600}
+  .wx-note{max-width:560px;margin:12px auto 0;background:var(--paper-2);border:1px solid var(--line);
+    border-radius:12px;padding:12px 15px;font-size:.9rem;color:var(--ink);line-height:1.85}
+  .wx-note b{color:var(--cinnabar)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="title">经络养生 · 十二时辰图谱</h1>
+    <div class="sub">黄帝内经 · 子午流注 · 顺时养生</div>
+  </header>
+
+  <div class="now" id="nowBanner"></div>
+
+  <div class="clockwrap">
+    <svg class="clock" viewBox="0 0 400 400" role="img" aria-label="十二时辰养生钟">
+      <g id="segs"></g>
+      <circle class="hub" cx="200" cy="200" r="86"/>
+      <text class="hubt2" x="200" y="180">现在</text>
+      <text class="hubt1" id="hubTime" x="200" y="200">—</text>
+      <text class="hubt2" id="hubZhi" x="200" y="220">时辰</text>
+      <text class="hubt2" id="hubMer" x="200" y="236" style="fill:var(--cinnabar)">经络当令</text>
+    </svg>
+  </div>
+  <div class="clock-hint">轻触任一时辰 · 进入对应经络（外圈色＝五行）</div>
+
+  <h2 class="sec"><span class="mark"></span>五行 · 脏腑表里 · 相生相克</h2>
+  <p class="sec-lead">十二经不是孤立的——五脏六腑按<b>五行</b>相生相养、相克相制，脏与腑<b>表里</b>相依。这是养生的底层系统。轻触任一"行"进入对应脏经。</p>
+  <div class="wuxing">
+    <div class="wx-wrap"><svg class="wx-svg" id="wxSvg" viewBox="0 0 360 360" role="img" aria-label="五行相生相克图"></svg></div>
+    <div class="wx-legend">
+      <span class="s">外环相生</span>　木→火→土→金→水→木（相互滋养）<br>
+      <span class="k">内线相克</span>　木克土 · 土克水 · 水克火 · 火克金 · 金克木（相互制约）
+    </div>
+    <div class="wx-note">把十二经当成<b>一个系统</b>来养：气血按<b>时辰</b>流注、脏腑按<b>表里</b>相依、五行按<b>生克</b>相调。<br>养生＝顺这套节律：<b>应季</b>（春养肝、夏养心、长夏养脾、秋养肺、冬养肾）、<b>调情志</b>（怒伤肝、喜伤心、思伤脾、悲伤肺、恐伤肾）、<b>按时作息</b>（当令时辰养对应经）、<b>循经保健</b>。<br><span style="color:var(--ink-faint);font-size:.82rem">注：心包、三焦属"相火"，养生随心（火）。</span></div>
+  </div>
+
+  <h2 class="sec"><span class="mark"></span>十二经流注 · 顺时而养</h2>
+  <p class="sec-lead">一天中，气血依次流注十二经络。从寅时（3–5点）<b>肺经</b>当令开始，昼夜循环。点开任一条查看走向、穴位、病候与养生。<br>另有<b>奇经·任督二脉</b>贯通前后正中，见下方 →</p>
+  <div class="grid" id="grid"></div>
+
+  <h2 class="sec"><span class="mark"></span>奇经 · 任督二脉</h2>
+  <p class="sec-lead">十二经之外，<b>任脉</b>（阴脉之海 · 前正中线）与<b>督脉</b>（阳脉之海 · 后正中线）一阴一阳、总任总督一身阴阳，合走一圈即"小周天"。</p>
+  <div class="grid" id="qijing"></div>
+
+  <footer>— 经络养生 <span class="plum">❁</span> 愿你与家人 顺时而养 · 气顺神安 —</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 子午流注：时辰 → 经络 · 器官 · 页面
+const MER=[
+  {zhi:'子',tm:'23–1点',org:'胆',el:'木',name:'足少阳胆经',file:'足少阳胆经.html'},
+  {zhi:'丑',tm:'1–3点', org:'肝',el:'木',name:'足厥阴肝经',file:'足厥阴肝经.html'},
+  {zhi:'寅',tm:'3–5点', org:'肺',el:'金',name:'手太阴肺经',file:'手太阴肺经.html'},
+  {zhi:'卯',tm:'5–7点', org:'大肠',el:'金',name:'手阳明大肠经',file:'手阳明大肠经.html'},
+  {zhi:'辰',tm:'7–9点', org:'胃',el:'土',name:'足阳明胃经',file:'足阳明胃经.html'},
+  {zhi:'巳',tm:'9–11点',org:'脾',el:'土',name:'足太阴脾经',file:'足太阴脾经.html'},
+  {zhi:'午',tm:'11–13点',org:'心',el:'火',name:'手少阴心经',file:'手少阴心经.html'},
+  {zhi:'未',tm:'13–15点',org:'小肠',el:'火',name:'手太阳小肠经',file:'手太阳小肠经.html'},
+  {zhi:'申',tm:'15–17点',org:'膀胱',el:'水',name:'足太阳膀胱经',file:'足太阳膀胱经.html'},
+  {zhi:'酉',tm:'17–19点',org:'肾',el:'水',name:'足少阴肾经',file:'足少阴肾经.html'},
+  {zhi:'戌',tm:'19–21点',org:'心包',el:'相火',name:'手厥阴心包经',file:'手厥阴心包经.html'},
+  {zhi:'亥',tm:'21–23点',org:'三焦',el:'相火',name:'手少阳三焦经',file:'手少阳三焦经.html'},
+];
+const EC={木:'#5c8a52',火:'#b23a2e',土:'#c9922b',金:'#9c8b63',水:'#3f6d86',相火:'#c0553f'};
+// 当前时辰 index（子=0…亥=11）
+function currentIdx(){const h=new Date().getHours();return Math.floor(((h+1)%24)/2);}
+
+const SVGNS='http://www.w3.org/2000/svg';
+const CX=200,CY=200,rIn=92,rOut=176,rLab=150,rOrg=124;
+function pt(r,deg){const a=deg*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)];}
+function sectorPath(a0,a1){ return ringPath(a0,a1,rIn,rOut); }
+function ringPath(a0,a1,ri,ro){
+  const[x0,y0]=pt(ro,a0),[x1,y1]=pt(ro,a1),[x2,y2]=pt(ri,a1),[x3,y3]=pt(ri,a0);
+  return `M${x0.toFixed(1)},${y0.toFixed(1)} A${ro},${ro} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} A${ri},${ri} 0 0 0 ${x3.toFixed(1)},${y3.toFixed(1)} Z`;
+}
+const cur=currentIdx();
+const segs=document.getElementById('segs');
+MER.forEach((m,i)=>{
+  const centerDeg=-90+i*30;             // 子 顶部，顺时针
+  const a0=centerDeg-15+1.2, a1=centerDeg+15-1.2;
+  const g=document.createElementNS(SVGNS,'g');
+  g.setAttribute('class','seg'+(m.file?'':' soon')+(i===cur?(m.file?' live':' on'):''));
+  g.setAttribute('role','button'); g.setAttribute('tabindex','0');
+  g.setAttribute('aria-label',m.zhi+'时 '+m.name+(m.file?'':' 即将推出'));
+  const path=document.createElementNS(SVGNS,'path');
+  path.setAttribute('class','segfill'); path.setAttribute('d',sectorPath(a0,a1));
+  const rim=document.createElementNS(SVGNS,'path');   // 五行色外环
+  rim.setAttribute('d',ringPath(a0,a1,rOut+2,rOut+8)); rim.setAttribute('fill',EC[m.el]||'#ccc');
+  rim.setAttribute('opacity','0.9'); rim.setAttribute('pointer-events','none');
+  const [zx,zy]=pt(rLab,centerDeg); const [ox,oy]=pt(rOrg,centerDeg);
+  const zt=document.createElementNS(SVGNS,'text'); zt.setAttribute('class','zhi');
+  zt.setAttribute('x',zx.toFixed(1)); zt.setAttribute('y',(zy+5).toFixed(1)); zt.setAttribute('text-anchor','middle'); zt.textContent=m.zhi;
+  const ot=document.createElementNS(SVGNS,'text'); ot.setAttribute('class','org');
+  ot.setAttribute('x',ox.toFixed(1)); ot.setAttribute('y',(oy+3.5).toFixed(1)); ot.setAttribute('text-anchor','middle'); ot.textContent=m.org;
+  g.appendChild(path); g.appendChild(rim); g.appendChild(zt); g.appendChild(ot);
+  const go=()=>open(m);
+  g.addEventListener('click',go);
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+  segs.appendChild(g);
+});
+
+// ── 五行相生相克轮 ──
+const WX=[
+ {el:'木',ang:-90,c:'#5c8a52',zang:['肝','足厥阴肝经.html'],fu:'胆',ssn:'春',emo:'怒'},
+ {el:'火',ang:-18,c:'#b23a2e',zang:['心','手少阴心经.html'],fu:'小肠',ssn:'夏',emo:'喜'},
+ {el:'土',ang:54, c:'#c9922b',zang:['脾','足太阴脾经.html'],fu:'胃',ssn:'长夏',emo:'思'},
+ {el:'金',ang:126,c:'#9c8b63',zang:['肺','手太阴肺经.html'],fu:'大肠',ssn:'秋',emo:'悲'},
+ {el:'水',ang:198,c:'#3f6d86',zang:['肾','足少阴肾经.html'],fu:'膀胱',ssn:'冬',emo:'恐'},
+];
+(function(){
+  const R=112,WC=180,wx=document.getElementById('wxSvg'); if(!wx) return;
+  const Pw=a=>[WC+R*Math.cos(a*Math.PI/180), WC+R*Math.sin(a*Math.PI/180)];
+  wx.innerHTML='<defs><marker id="wxar" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#a9822f"/></marker></defs>';
+  [[0,2],[1,3],[2,4],[3,0],[4,1]].forEach(([i,j])=>{          // 相克 内五星
+    const [x1,y1]=Pw(WX[i].ang),[x2,y2]=Pw(WX[j].ang);
+    const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),t=34/L;
+    const ln=document.createElementNS(SVGNS,'line');
+    ln.setAttribute('x1',(x1+dx*t).toFixed(1));ln.setAttribute('y1',(y1+dy*t).toFixed(1));
+    ln.setAttribute('x2',(x2-dx*t).toFixed(1));ln.setAttribute('y2',(y2-dy*t).toFixed(1));
+    ln.setAttribute('class','wx-ke');wx.appendChild(ln);
+  });
+  WX.forEach((w,i)=>{                                          // 相生 外环弧
+    const a0=w.ang+16, a1=WX[(i+1)%5].ang+(i===4?360:0)-16;
+    const [x0,y0]=Pw(a0),[x1,y1]=Pw(a1);
+    const pa=document.createElementNS(SVGNS,'path');
+    pa.setAttribute('d',`M${x0.toFixed(1)},${y0.toFixed(1)} A${R},${R} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)}`);
+    pa.setAttribute('class','wx-sheng');pa.setAttribute('stroke',w.c);pa.setAttribute('opacity','0.6');
+    pa.setAttribute('marker-end','url(#wxar)');wx.appendChild(pa);
+  });
+  WX.forEach(w=>{                                              // 节点
+    const [x,y]=Pw(w.ang), below=y<WC;
+    const g=document.createElementNS(SVGNS,'g');g.setAttribute('class','wx-node');
+    g.setAttribute('role','button');g.setAttribute('tabindex','0');g.setAttribute('aria-label',w.el+' '+w.zang[0]+w.fu);
+    const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','wx-c');
+    c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',31);c.setAttribute('fill',w.c);
+    c.setAttribute('stroke','#FBF6E7');c.setAttribute('stroke-width','2.5');
+    const t=document.createElementNS(SVGNS,'text');t.setAttribute('class','wx-el');
+    t.setAttribute('x',x);t.setAttribute('y',y+9);t.textContent=w.el;
+    const ly = below? y-42 : y+46;
+    const o=document.createElementNS(SVGNS,'text');o.setAttribute('class','wx-organ');
+    o.setAttribute('x',x);o.setAttribute('y',ly);o.textContent=w.zang[0]+' · '+w.fu;
+    const m=document.createElementNS(SVGNS,'text');m.setAttribute('class','wx-meta');
+    m.setAttribute('x',x);m.setAttribute('y',ly+(below?-14:14));m.textContent=w.ssn+' · '+w.emo;
+    g.appendChild(c);g.appendChild(t);g.appendChild(o);g.appendChild(m);
+    const go=()=>{location.href=w.zang[1];};
+    g.addEventListener('click',go);
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+    wx.appendChild(g);
+  });
+})();
+
+function open(m){
+  if(m.file){ location.href=m.file; }
+  else{ toast(m.name+' · 即将推出'); }
+}
+let tT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);}
+
+// 中心 & 当令 banner
+(function(){
+  const m=MER[cur];const d=new Date();
+  const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+  document.getElementById('hubTime').textContent=hh+':'+mm;
+  document.getElementById('hubZhi').textContent=m.zhi+'时 · '+m.tm;
+  document.getElementById('hubMer').textContent=m.name+' 当令';
+  const link=m.file?`<a href="${m.file}">${m.name}</a>`:m.name;
+  document.getElementById('nowBanner').innerHTML=
+    `<div class="big">现在 ${hh}:${mm} · <b>${m.zhi}时</b>（${m.tm}）· ${link} 当令</div>`+
+    `<small>此时宜顺其经气而养 —— ${m.org}经气血最旺</small>`;
+})();
+
+// 流注卡片（从肺经/寅时起，按流注顺序）
+const grid=document.getElementById('grid');
+const order=[]; for(let k=0;k<12;k++){order.push((2+k)%12);}  // 寅(肺)开始
+order.forEach(i=>{
+  const m=MER[i];const ready=!!m.file;const live=(i===cur);
+  const el=document.createElement(ready?'a':'div');
+  el.className='mcard '+(ready?'ready':'soon')+(live?' live':'');
+  if(ready) el.href=m.file;
+  el.innerHTML=`<div class="r1"><span class="zhi">${m.zhi}</span><span class="tm">${m.tm}</span></div>`+
+    `<div class="name">${m.name}</div>`+
+    `<div class="st">${ready?'查看图谱 ›':'即将推出'}</div>`+
+    (live?'<span class="flag">当令</span>':'');
+  if(!ready) el.addEventListener('click',()=>toast(m.name+' · 即将推出'));
+  grid.appendChild(el);
+});
+
+// 奇经·任督二脉卡片
+const QJ=[{name:'任脉',en:'阴脉之海 · 前正中线',n:'24 穴',file:'任脉.html',c:'#4a7a6a'},
+          {name:'督脉',en:'阳脉之海 · 后正中线',n:'28 穴',file:'督脉.html',c:'#9c5a3a'}];
+const qg=document.getElementById('qijing');
+QJ.forEach(q=>{
+  const el=document.createElement('a'); el.className='mcard ready'; el.href=q.file;
+  el.style.borderLeft='4px solid '+q.c;
+  el.innerHTML=`<div class="r1"><span class="name" style="line-height:1.1">${q.name}</span></div>`+
+    `<div class="st" style="color:var(--ink-soft);font-weight:500">${q.en}</div>`+
+    `<div class="st" style="color:var(--gold-deep);font-weight:600">${q.n} · 查看图谱 ›</div>`;
+  qg.appendChild(el);
+});
+</script>
+</body>
+</html>
