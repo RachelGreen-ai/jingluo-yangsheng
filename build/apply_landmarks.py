@@ -47,7 +47,7 @@ def bl_vessel(coords):
 LEG_MERIDIANS   = {'st','sp','ki','gb','lr'}
 FACE_MERIDIANS  = {'li','st','si'}
 HAND_MERIDIANS  = {'li','ht','si','pc','sj'}
-TORSO_MERIDIANS = {'st','sp','ki'}
+TORSO_MERIDIANS = {'st','sp','ki','pc'}
 
 # 连接段穴位(肩/腋/胁/髋等)不在地标公式内，手工核对后的坐标，放在躯干侧不压到手臂
 CONNECTOR = {
