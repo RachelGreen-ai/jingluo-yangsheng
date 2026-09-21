@@ -1,8 +1,13 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 
 const root = process.cwd();
 const outDir = join(root, "public");
+const analyticsSnippet = `
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>`;
 const excludedNames = new Set([
   ".git",
   ".vercel",
@@ -41,6 +46,14 @@ for (const entry of [
 
   const source = join(root, entry);
   if (existsSync(source)) {
-    cpSync(source, join(outDir, entry), { recursive: true });
+    const target = join(outDir, entry);
+    cpSync(source, target, { recursive: true });
+
+    if (entry.endsWith(".html")) {
+      const html = readFileSync(target, "utf8");
+      if (!html.includes("/_vercel/insights/script.js")) {
+        writeFileSync(target, html.replace("</body>", `${analyticsSnippet}\n</body>`), "utf8");
+      }
+    }
   }
 }

@@ -434,5 +434,9 @@ animBtn.onclick=()=>{ anim=!anim; document.body.classList.toggle('no-anim',!anim
 animBtn.classList.add('active'); animBtn.textContent='✦ 动画开';
 if(matchMedia('(prefers-reduced-motion: reduce)').matches){ document.body.classList.add('no-anim'); anim=false; window.__qi&&__qi.stop(); animBtn.classList.remove('active'); animBtn.textContent='✧ 动画关'; animBtn.setAttribute('aria-pressed',false); }
 </script>
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
