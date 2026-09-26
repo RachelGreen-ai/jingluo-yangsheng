@@ -62,6 +62,21 @@ FRONT_CROPS = {
 }
 
 
+def head_x_shift(image_y):
+    """Match the small head-straightening shear applied to the front image."""
+    if image_y <= 70:
+        return 4.0
+    if image_y < 210:
+        t = (image_y - 70) / 140
+        smooth = t * t * (3 - 2 * t)
+        return 4.0 - 2.5 * smooth
+    if image_y < 250:
+        t = (image_y - 210) / 40
+        smooth = t * t * (3 - 2 * t)
+        return 1.5 * (1 - smooth)
+    return 0.0
+
+
 def remap_front_point(x, y):
     """Map original 100x150 front-photo coordinates to the repaired image."""
     px, py = x * 8.2, y * 8.2
@@ -73,7 +88,7 @@ def remap_front_point(x, y):
         scale = 0.94 + 0.06 * ((out_y - 210) / 40)
     else:
         out_y, scale = py, 1.0
-    out_x = center + (px - center) * scale
+    out_x = center + (px - center) * scale + head_x_shift(out_y)
     return round(out_x / 8.2, 2), round(out_y / 8.2, 2)
 
 
