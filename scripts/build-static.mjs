@@ -8,6 +8,7 @@ const analyticsSnippet = `
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>`;
+const faviconLink = '<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">';
 const excludedNames = new Set([
   ".git",
   ".vercel",
@@ -50,10 +51,14 @@ for (const entry of [
     cpSync(source, target, { recursive: true });
 
     if (entry.endsWith(".html")) {
-      const html = readFileSync(target, "utf8");
-      if (!html.includes("/_vercel/insights/script.js")) {
-        writeFileSync(target, html.replace("</body>", `${analyticsSnippet}\n</body>`), "utf8");
+      let html = readFileSync(target, "utf8");
+      if (!html.includes('rel="icon"')) {
+        html = html.replace("</head>", `  ${faviconLink}\n</head>`);
       }
+      if (!html.includes("/_vercel/insights/script.js")) {
+        html = html.replace("</body>", `${analyticsSnippet}\n</body>`);
+      }
+      writeFileSync(target, html, "utf8");
     }
   }
 }
